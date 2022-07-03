@@ -32,32 +32,16 @@ class Data_handling :
 		
 		return result
 		
-		"""
-		def getRecordByInfo(self, info, key) :
-			result = None
-			
-			if self.infoExist(info, key) :
-				
-				for record in self.getRecords() :
-					
-					if x.split(self.__INFO_SEPERATOR)[self.__columns_key[key]] == info :
-						
-						result = x
-					
-			else :
-				
-				return None
-				
-				"""
-				
-	def getInfosInDict(self, key) :
+	
+	def getRowByRecord(self, value, key) :
 		
-		return {x.split(self.__INFOS_SEPPERATOR)[self.__columns_key[key]] : x.split(self.__INFOS_SEPPERATOR) for x in self.getRecords()}
+		return tuple(record for record in self.getRecords() if record.split(self.__INFOS_SEPPERATOR)[self.__columns_key[key]] == value)[0]
 		
+	
 	def getRecords(self) :
 		self.__file_read.seek(0)
 		return self.__file_read.read().split(self.__RECORD_SEPERATOR)[:-1]
-		
+	
 		
 	def recordsCount(self) :
 		
@@ -93,11 +77,15 @@ class Data_handling :
 		
 		if self.infoExist(value, key) :
 			
-			savedPassword = self.getInfosInDict(key)[value][self.__columns_key["password"]]
+			savedPassword = self.getRowByRecord(value, key)[self.__columns_key["password"]]
 			
 			if password == savedPassword :
 				
 				result = True
+			
+			
+		if not result :
+				print(f"{key} or password is incorrect")
 				
 		return result
 	
@@ -108,34 +96,3 @@ class Data_handling :
 	def allowedToLoginByUsername(self, username, password) :
 		
 		return self.__allowedToLoginByKey(username, "username", password)
-		
-		
-	
-"""
-__file_read = None
-__file_write = None
-
-def createDB() :
-	global __file_read
-	global __file_write
-	
-	__file_read = open("database.txt", "a+")
-	__file_read = open("database.txt", "r")
-	
-	
-def registerPlr(username, email, password) :
-	
-	global __file_write
-	
-	__file_write.write(f"{username}\u2662{email}\u2662{password}\u2661")
-		
-	__file_write.close()
-		
-
-def getRecords() :
-	global __file_read
-	global __file_write
-	
-	return __file_read.read().split("\u2661")
-"""
-	
