@@ -1,6 +1,7 @@
 import re
 from data_handling import Data_handling as db
 
+__db_handling_obj = None
 
 def __invalidEmail(email) :
 	
@@ -32,30 +33,51 @@ def __checkValue(key) :
 	return value
 
 	
-def __wanaTryAgainInRegister(username,email, password) :
-	tryAgain = input("wana Try Again ?? (y/n) : ").lower()
-	if tryAgain == "y" :
+def __wanaContinueInRegister(username,email, password) :
+	
+	go_on = input("wana Try Again ?? (y/n) : ").lower()
+	
+	if go_on == "y" :
+		
+		if __db_handling_obj.registerPlr(username, email, password) :
+			
+			print("\nsinging up successfully done.")
+			
+		start(__db_handling_obj)
+		
+	elif go_on == "n" :
 		
 		print("\nRetrying Register : ")
-		__sign_up()	
+		__sign_up()
 		
-	elif tryAgain == "n" :
-		
-		if db().registerPlr(username, email, password) :
-			print("singing up successfully done.")
-			
-		else : 
-			start()
-			
 	else :
 		print("Invalid Input.")
-		__wanaTryAgainInRegister(username, email, password)
+		__wanaContinueInRegister(username, email, password)
 	
 	
 def __sign_in() :
-	pass
-
-
+	
+	sign_in_type = input("sign in with username or email ?? (u/e) : ").lower()
+	
+	byUser = sign_in_type == "u"
+	byEmail = sign_in_type == "e"
+	
+	if not (byUser or byEmail) :
+		
+		print("invalid input.")
+		__sign_in()
+		
+	key = "username" if byUser else "email"
+	
+	value = input(f"{key} : ")
+	password = input("password : ")
+	
+	result = __db_handling_obj.allowedToLoginByEmail(value, password) if byEmail else __db_handling_obj.allowedToLoginByUsername(value, password)
+	
+	if result :
+		print("\nSuccessfully logged in.")
+		#continue to take quiz
+		
 def __sign_up() :
 	
 	username = __checkValue("username")
@@ -64,10 +86,13 @@ def __sign_up() :
 
 	print(f"\nyour informations are :\n\t{username = }\n\t{email = }\n\t{password = }\n")
 	
-	__wanaTryAgainInRegister(username, email, password)
+	__wanaContinueInRegister(username, email, password)
 	
 	
-def start() :
+def start(db_handling_obj) :
+	
+	global __db_handling_obj
+	__db_handling_obj =  db_handling_obj
 	
 	print("sign up or sign in ??\n")
 	sign = input('type "up" for sign up / "in"" for sign_in : ').lower()
@@ -81,5 +106,5 @@ def start() :
 	else :
 	
 		print("INVALID INPUT, TRY AGAIN.")
-		start()
+		start(db_handling_obj)
 		
