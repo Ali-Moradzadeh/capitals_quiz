@@ -1,5 +1,5 @@
 import re
-from data_handling import Data_handling as db
+from local_database_handling import Data_handling as db
 
 __db_handling_obj = None
 
