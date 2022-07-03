@@ -1,8 +1,8 @@
 import os
 import mysql.connector as connector
 import confirm_identification as txtDb
-import server_db_handle
-import data_handling
+import server_database_handling
+import local_database_handling
 
 __host = "host"
 __username = "user"
@@ -45,7 +45,7 @@ def whereToSaveDatas() :
 		if checkConnection() :
 			
 			go_on = input("Continue ?? (y for yes anyother for no) : ").lower()
-			__db_handling_obj = server_db_handle.Data_handling(__detailes, __db)
+			__db_handling_obj = server_database_handling.Data_handling(__detailes, __db)
 		
 			if go_on == "y" and __db_handling_obj.checkValidTable():
 				
@@ -64,7 +64,7 @@ def whereToSaveDatas() :
 		
 		print("players informations have been saved in 'Database.txt' file in project main directory.")
 		
-		__db_handling_obj = data_handling.Data_handling()
+		__db_handling_obj = local_database_handling.Data_handling()
 		
 		txtDb.start(__db_handling_obj)
 	else :
