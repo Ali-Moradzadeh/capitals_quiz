@@ -159,14 +159,10 @@ class Data_handling :
 	def __allowedToLoginByKey(self, value, key, password) :
 	
 		result = self.infoExist(value, key) and self.getRowByRecord(value, key)[2] == password
-	
-		if result :
-			
-			print("logged in.")
-			
-		else :
+		if not result :
 			
 			print(f"{key} or password is incorrent.")
 			
 		return result
 			
+
