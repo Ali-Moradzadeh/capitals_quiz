@@ -19,9 +19,24 @@ class Data_handling :
 		self.__cursor = db.cursor()
 		self.__table = detailes["table"]
 		self.__database = detailes["database"]
-		
+
+
+	def __checkTableExist(self) :
+		self.__cursor.execute("show tables")
+		tables = self.__cursor.fetchall()		
+		result = False
+
+		for table in tables :
+			result = self.__table in table
+
+		return result
+
+
 	def checkValidTable(self) :
-		
+		if not self.__checkTableExist() :
+			print("table not found.")
+			return False
+
 		query = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='{self.__database}' AND TABLE_NAME='{self.__table}'"
 		
 		self.__cursor.execute(query)
