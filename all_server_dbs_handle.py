@@ -1,8 +1,12 @@
 import mysql.connector as connector
 
+last_obj = None
+
 class Server_Database_Handling :
 	
 	def __init__(self, host, user, password, database) :
+		global last_obj
+		last_obj = self
 		
 		self.__host = host
 		self.__user = user
@@ -24,7 +28,7 @@ class Server_Database_Handling :
 			self.__cursor = self.__db.cursor()
 			return True
 			 
-		except ConnectionError :
+		except :
 			
 			return False
 	
@@ -134,3 +138,5 @@ class Server_Database_Handling :
 				i+=1
 				
 			return dic
+			
+			
