@@ -1,3 +1,5 @@
+obj = None
+
 class Data_handling :
 
 	__used_column_names = []
@@ -11,7 +13,10 @@ class Data_handling :
 	__columns_index = {__column_username : 0, __column_email : 1, __column_password : 2, __column_score :3}
 
 	def __init__(self, table, allDBsHandleObj) :
-
+		
+		global obj
+		obj = self
+		
 		self.__serverDBsHand = allDBsHandleObj
 		self.__db = allDBsHandleObj.getDB()
 		self.__cursor = self.__db.cursor()
@@ -99,3 +104,26 @@ class Data_handling :
 		return result
 
 
+
+	def __setScore(self) :
+		pass
+
+
+
+	def increaseScoreBy(self, usename, increased) :
+	
+		row = self.getRowByRecord(usename, self.__dict_k_key_v_columnNames["username"])
+	
+		newScore = int(row[3]) + increased
+	
+		self.__cursor.execute(f"update {self.__table} set {self.__dict_k_key_v_columnNames[self.__column_score]} = {newScore} where {self.__dict_k_key_v_columnNames[self.__column_username]} = '{row[0]}'")
+	
+		self.__db.commit()
+		
+		
+	def executeQuery(self, select, where, orderBy, limit) :
+		
+		self.__cursor.execute(f"select {select} from {self.__table} where {where} order by {orderBy} limit {limit}")
+		
+		return self.__cursor.fetchall()
+		

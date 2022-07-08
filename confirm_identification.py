@@ -1,7 +1,8 @@
 import re
-from local_database_handling import Data_handling as db
+import quiz
 
-__db_handling_obj = None
+dbObj = None
+#dbObj = None
 
 def __invalidEmail(email) :
 	
@@ -35,15 +36,15 @@ def __checkValue(key) :
 	
 def __wanaContinueInRegister(username,email, password) :
 	
-	go_on = input("wana Try Again ?? (y/n) : ").lower()
+	go_on = input("Continue ?? (y/n) : ").lower()
 	
 	if go_on == "y" :
 		
-		if __db_handling_obj.registerPlr(username, email, password) :
+		if dbObj.registerPlr(username, email, password) :
 			
 			print("\nsinging up successfully done.")
 			
-		start(__db_handling_obj)
+		start(dbObj)
 		
 	elif go_on == "n" :
 		
@@ -66,18 +67,28 @@ def __sign_in() :
 		
 		print("invalid input.")
 		__sign_in()
+	
+	else :
+		key = "username" if byUser else "email"
+	
+		value = input(f"{key} : ")
+		password = input("password : ")
+		result = dbObj.allowedToLoginByEmail(value, password) if byEmail else dbObj.allowedToLoginByUsername(value, password)
+	
+		if result :
+			print("\nSuccessfully logged in.")
+			#continue to take quiz
 		
-	key = "username" if byUser else "email"
-	
-	value = input(f"{key} : ")
-	password = input("password : ")
-	
-	result = __db_handling_obj.allowedToLoginByEmail(value, password) if byEmail else __db_handling_obj.allowedToLoginByUsername(value, password)
-	
-	if result :
-		print("\nSuccessfully logged in.")
-		#continue to take quiz
+			loggedUsername = dbObj.getRowByRecord(value, key)[0]
 		
+			quizObj = quiz.quizMaker(loggedUsername)
+		
+			quizObj.start()
+			
+		else :
+			start(dbObj)
+		
+
 def __sign_up() :
 	
 	username = __checkValue("username")
@@ -89,10 +100,10 @@ def __sign_up() :
 	__wanaContinueInRegister(username, email, password)
 	
 	
-def start(db_handling_obj) :
+def start(db_obj) :
 	
-	global __db_handling_obj
-	__db_handling_obj =  db_handling_obj
+	global dbObj
+	dbObj =  db_obj
 	
 	print("sign up or sign in ??\n")
 	sign = input('type "up" for sign up / "in"" for sign_in : ').lower()
@@ -106,5 +117,5 @@ def start(db_handling_obj) :
 	else :
 	
 		print("INVALID INPUT, TRY AGAIN.")
-		start(db_handling_obj)
+		start(dbObj)
 		
