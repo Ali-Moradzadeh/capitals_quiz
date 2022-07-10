@@ -14,3 +14,7 @@ mysql.connector
 if you use offline mode (local database)
 never changed or delete Database.txt and .Datas.enc file
 ******************************************************
+
+how To Run :
+
+just run startQuiz.py file
