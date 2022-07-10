@@ -4,4 +4,6 @@ test.py
 *.ds
 lib/python3.10/site-packages/mysql/connector/locales/eng/__pycache__/
 lib/python3.10/site-packages/mysql/connector/locales/eng/__pycache__/
+.gitignore
+README.txt
 
