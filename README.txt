@@ -9,3 +9,8 @@ score between peoples so we use created .txt file in past step
 
 requirements :
 mysql.connector
+
+***********************IMPORTANT NOTE*****************
+if you use offline mode (local database)
+never changed or delete Database.txt and .Datas.enc file
+******************************************************
