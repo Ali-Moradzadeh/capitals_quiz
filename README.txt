@@ -7,3 +7,5 @@ in this project we use .txt file
 also we want to have a table to show the most highest
 score between peoples so we use created .txt file in past step
 
+requirements :
+mysql.connector
