@@ -1,3 +1,6 @@
+from find_match_table import FindMatchTable
+import check_db_type as whichDB
+
 obj = None
 
 class Data_handling :
@@ -11,7 +14,9 @@ class Data_handling :
 	__columns = [__column_username,__column_email, __column_password, __column_score]
 
 	__columns_index = {__column_username : 0, __column_email : 1, __column_password : 2, __column_score :3}
-
+	
+	__findMatchTableObj = None
+	
 	def __init__(self, table, allDBsHandleObj) :
 		
 		global obj
@@ -23,25 +28,19 @@ class Data_handling :
 		self.__table = table
 		self.__column_names = None
 		self.__dict_k_key_v_columnNames = None
-
-
+		
+		self.__findMatchTableObj = FindMatchTable(whichDB.getDBDetailesName())
+		
+		
 	def isTableValid(self) :
-		if not self.__serverDBsHand.tableExist(self.__table) :
-			print("table not found.")
-			return False
-
-		self.__column_names = self.__serverDBsHand.getColumns(self.__table)
-
-		print(f"\ncolumn names are : {self.__column_names}\n")
-
-		if not len(self.__column_names) == 4 :
-
-			print("table must have exactly 4 columns")
-			return False
-
-		self.__dict_k_key_v_columnNames = self.__serverDBsHand.defineEachColumnStoreWhatData(self.__table, self.__columns)
-
-		return True
+		
+		result = self.__findMatchTableObj.isTableValid(self.__table, self.__columns)
+		
+		self.__dict_k_key_v_columnNames = self.__findMatchTableObj.getColumnDict()
+		
+		return result
+			
+		
 
 
 	def registerPlr(self, username, email, password) :

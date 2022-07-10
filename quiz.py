@@ -2,8 +2,11 @@ from os import  system
 from random import  shuffle
 from random import randint
 import confirm_identification as conf_ID
-import question_server_db_handling as questDb
 import local_database_handling as localDB
+from question_server_db_handling import question_data_handling as serverQuestDB
+from question_local_db_handling import question_data_handling as localQuestDB
+import check_db_type as whichDB
+
 
 def numInputHandler(message) :
 	
@@ -26,9 +29,6 @@ class quizMaker :
 		
 		self.__username = username
 		self.__gameDetailes = conf_ID.dbObj
-		self.__capitals = questDb.getCapitals()
-		self.__countries = questDb.getCountries()
-		self.__hardnesses = questDb.getHardnesses()
 		
 		self.__remainCountries = None
 		self.__remainCapitals = None
@@ -38,7 +38,19 @@ class quizMaker :
 		self.__countryQuest = False
 		self.__userAnswer = None
 		self.__questKeyFlag = None
-
+		
+		self.__questDbObj = localQuestDB()
+		
+		if whichDB.isDBServerSide() :
+			
+			self.__questDbObj = serverQuestDB()
+			
+		if self.__questDbObj.everyThingIsOk() :
+			
+			self.__capitals = self.__questDbObj.getCapitals()
+			self.__countries = self.__questDbObj.getCountries()
+			self.__hardnesses = self.__questDbObj.getHardnesses()
+		
 		print(f"\nWelCome {self.__username}")
 
 	def __updateScore(self, score) :
@@ -55,7 +67,7 @@ class quizMaker :
 		
 		self.__questKeyFlag = "country" if self.__countryQuest else "capital"
 
-		questionStruct = lambda key : f"where '{key}' is capital of : " if self.__countryQuest else f"city '{key}' is capital of : "
+		questionStruct = lambda key : f"which is {key} capital : " if self.__countryQuest else f"city '{key}' is capital of : "
 		
 		key = None
 		if self.__countryQuest :
@@ -135,7 +147,7 @@ class quizMaker :
 				
 				correctAnswersCount += 1
 				correctAnswersCombo += 1
-				tillLastTruthAnswerScore += questDb.getHardnessByKey(self.__questKey, "country" if self.__countryQuest else "capital")
+				tillLastTruthAnswerScore += self.__questDbObj.getHardnessByKey(self.__questKey, "country" if self.__countryQuest else "capital")
 				
 			else :
 				wrongAnswerCount += 1

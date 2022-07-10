@@ -1,69 +1,99 @@
-import mysql.connector as con
 import all_server_dbs_handle as allServerDB
-import functools
-
-db = None
-
-host = "127.0.0.1"
-user = "alimo"
-password = "72943816002123"
-database = "capital_quiz_plrs"
-table = "capitals"
-
-obj = allServerDB.Server_Database_Handling(host, user, password, database)
-db = obj.getDB()
+import check_db_type as whichDB
+from find_match_table import FindMatchTable
 
 
-def getRows() :
+class question_data_handling :
 	
-	global db
-	global table
-	global ast
+	db = None
+	host = None
+	user = None
+	password = None
+	database = None
+	table =  None
 	
-	cursor = db.cursor()
-	
-	cursor.execute(f"select * from {table}")
-	rows = cursor.fetchall()
-	return rows
-	
-	
-def __getColumnRecords(columnName) :
+	obj = None
+	__columnsFlag = ("country", "capital", "hardness")
+	__columns_dict = None
 
-	global db
-	global table
-	global obj
-	
-	if columnName in obj.getColumns(table) :
+
+	def __init__(self) :
 		
-		cursor = db.cursor()
-		cursor.execute(f"select {columnName} from {table}")
-	
-		return tuple(country[0] for country in cursor.fetchall())
+		self.host = whichDB.getDBDetailesName()["host"]
+		self.user = whichDB.getDBDetailesName()["user"]
+		self.password = whichDB.getDBDetailesName()["password"]
+		self.database = whichDB.getDBDetailesName()["database"]
+		self.obj = allServerDB.Server_Database_Handling(self.host, self.user, self.password, self.database)
+		self.db = self.obj.getDB()
+		self.__findMatchTableObj = FindMatchTable(whichDB.getDBDetailesName())
+		self.table = self.__getTableName()
+
+		if self.__findMatchTableObj.isTableValid(self.table, self.__columnsFlag) :
+			self.__columns_dict = self.__findMatchTableObj.getColumnDict()
+			
+			
+	def everyThingIsOk(self) :
 		
-	return None
-
-
-def getCountries() :
-	return __getColumnRecords("country")
-
-
-def getCapitals() :
-	return __getColumnRecords("capital")
+		return self.__columns_dict != None
 	
 
-def getHardnesses() :
-	return __getColumnRecords("hardness")
+	def __getTableName(self) :
+		
+		string = input("\nyour questions table name : ")
+		
+		if not self.obj.tableExist(string) :
+			print("table not found. try again")
+			return self.__getTableName()
+			
+		return string
+		
+		
+	def getRows(self) :
+		
+		rows = None
+		if self.obj.checkConnection() :
+			
+			cursor = self.db.cursor()
+			cursor.execute(f"select * from {self.table}")
+			rows = cursor.fetchall()
+		
+		return rows
+	
+	
+	def __getColumnRecords(self, columnName) :
+
+		if columnName in self.obj.getColumns(self.table) :
+		
+			cursor = self.db.cursor()
+			cursor.execute(f"select {columnName} from {self.table}")
+	
+			return tuple(record[0] for record in cursor.fetchall())
+		
+		return None
+
+
+	def getCountries(self) :
+		return self.__getColumnRecords(self.__columns_dict["country"])
+
+
+	def getCapitals(self) :
+		return self.__getColumnRecords(self.__columns_dict["capital"])
+	
+
+	def getHardnesses(self) :
+		return self.__getColumnRecords(self.__columns_dict["hardness"])
 
 	
-def getHardnessByKey(value, key) :
+	def getHardnessByKey(self, value, key) :
 	
-	return getHardnesses()[list(__getColumnRecords(key)).index(value)]
+		return self.getHardnesses()[list(self.__getColumnRecords(key)).index(value)]
 	
 	
-def getCountryByCapital(capital) :
+	def getCountryByCapital(self, capital) :
 	
-	return getCountries()[list(getCapitals()).index(capital)]
+		return self.getCountries()[list(self.getCapitals()).index(capital)]
 	
-def getCapitalByCountry(country) :
 	
-	return getCapitals()[list(getCountries()).index(country)]
+	def getCapitalByCountry(self, country) :
+	
+		return self.getCapitals()[list(self.getCountries()).index(country)]

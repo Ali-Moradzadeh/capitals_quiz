@@ -2,7 +2,7 @@ from os import system
 import confirm_identification as CONF_ID
 import server_database_handling as server_db_handling
 import local_database_handling as localDB
-import all_server_dbs_handle as allDBsHandle
+from all_server_dbs_handle import Server_Database_Handling as allDBsHandle
 from game_detailes import GameDetailes
 
 __host = "host"
@@ -13,14 +13,27 @@ __table = "table"
 __infos = (__host, __username, __password, __database, __table)
 db_handling_obj = None
 __db = None
-__detailes = None
+__detailes = {}
 __DBsHandle = None
 __haveServerDb = None
+__isDBServerSide = False
 
 def __getDbInfos() :
 	
 	global __detailes
-	__detailes = {x : input(f"{x} : ") for x in __infos}
+	
+	i = 0
+	while len(__detailes) != len(__infos) :
+		
+		typed = input(f"{__infos[i]} : ")
+		confirm = input("confirm ? (y) : ").lower()
+		
+		if confirm != "y" :
+			continue
+		
+		__detailes[__infos[i]] = typed
+		i += 1
+		
 
 
 def __showGameDetailesOrGoToIdentification() :
@@ -43,11 +56,16 @@ def whereToSaveDatas() :
 	
 	global __haveServerDb
 	__haveServerDb = input("do you have any server side databade to save account informations ?? (y/n) : ").lower()
-
+	
+	
 	if __haveServerDb == "y" :
+		
+		global __isDBServerSide
+		__isDBServerSide = True
+		
 		__getDbInfos()
 		global __DBsHandle
-		__DBsHandle = allDBsHandle.Server_Database_Handling(__detailes[__host], __detailes[__username],__detailes[__password], __detailes[__database])
+		__DBsHandle = allDBsHandle(__detailes[__host], __detailes[__username],__detailes[__password], __detailes[__database])
 		
 		if __DBsHandle.checkConnection() :
 			print("Successfully Connected.")
@@ -81,3 +99,13 @@ def whereToSaveDatas() :
 	else :
 		print("invalid input. try again")
 		whereToSaveDatas()
+		
+def getDBDetailesName() :
+	
+	return __detailes
+
+
+def isDBServerSide() :
+	
+	global __isDBServerSide
+	return __isDBServerSide

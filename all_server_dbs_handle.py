@@ -15,7 +15,7 @@ class Server_Database_Handling :
 		self.__db = None
 		self.__cursor = None
 	
-	def getColumnNamesQuery(self, table) :
+	def __getColumnNamesQuery(self, table) :
 		
 		return f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{self.__database}' AND TABLE_NAME = '{table}'"
 	
@@ -41,6 +41,7 @@ class Server_Database_Handling :
 				
 	def tableExist(self, table) :
 		
+		result = False
 		if self.checkConnection() :
 			
 			query = "show tables"
@@ -48,22 +49,19 @@ class Server_Database_Handling :
 			self.__cursor.execute(query)
 			tables = self.__cursor.fetchall()
 			
-			result = False
 			for _table in tables :
 				if _table[0] == table :
 					result = True
 					break
-				
-			return result
 			
-		return False
+		return result
 		
 		
 	def columnExistInTable(self,  table, column) :
 		
 		if self.tableExist(table) :
 			
-			self.__cursor.execute(self.getColumnNamesQuery(table))
+			self.__cursor.execute(self.__getColumnNamesQuery(table))
 			
 			result = False
 			for _column in self.__cursor.fetchall() :
@@ -78,7 +76,7 @@ class Server_Database_Handling :
 	def getColumns(self, table) :
 		
 		if self.tableExist(table) :
-			self.__cursor.execute(self.getColumnNamesQuery(table))
+			self.__cursor.execute(self.__getColumnNamesQuery(table))
 			_columns = self.__cursor.fetchall()
 			columns = tuple(column[0] for column in _columns)
 			
@@ -100,7 +98,7 @@ class Server_Database_Handling :
 		
 		if self.columnExistInTable(table, column) :
 			
-			self.__cursor.execute(self.getColumnNamesQuery(table))
+			self.__cursor.execute(self.__getColumnNamesQuery(table))
 			columns = self.__cursor.fetchall()
 			return tuple(columns.index(_column) for _column in columns if _column[0] == column)[0]
 		
@@ -113,7 +111,6 @@ class Server_Database_Handling :
 		dic = None
 		if columns != None and len(columns) == len(dataFlags) :
 			
-			print(f"available flages : \n\t {dataFlags}\n")
 			dic = {}
 			i = 0
 			while len(dic) != len(columns) :
