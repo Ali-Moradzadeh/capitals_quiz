@@ -84,7 +84,7 @@ def whereToSaveDatas() :
 				whereToSaveDatas()
 			
 		else :
-			
+			print("connection falied.")
 			whereToSaveDatas()
 			
 	elif __haveServerDb == "n" :
